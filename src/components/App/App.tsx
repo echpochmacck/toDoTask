@@ -25,6 +25,9 @@ function App() {
       <Board
         tasks={tasks}
         onAddTask={() => setIsCreateModalOpen(true)}
+        onTaskStatusChange={(taskId, status) => {
+          setTasks((current) => current.map((task) => task.id === taskId ? { ...task, status } : task))
+        }}
         onDeleteTask={(taskId) => {
           setTasks((current) => current.filter((task) => task.id !== taskId))
         }}
