@@ -1,4 +1,4 @@
-import type { Task, TaskStatus } from '../TaskItem/types'
+import type { Task, TaskStatus } from '../../entities/task'
 
 export type BoardStatus = {
   id: TaskStatus
@@ -11,4 +11,6 @@ export type BoardStatus = {
 export type BoardStatusItemProps = {
   status: BoardStatus
   tasks: Task[]
+  onDeleteTask: (taskId: Task['id']) => void
 }
+

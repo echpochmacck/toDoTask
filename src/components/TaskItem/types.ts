@@ -1,12 +1,6 @@
-export type TaskStatus = 'todo' | 'in-progress' | 'done'
-
-export type Task = {
-  id: string
-  title: string
-  description?: string
-  status: TaskStatus
-}
+import type { Task } from '../../entities/task'
 
 export type TaskItemProps = {
   task: Task
+  onDeleteTask: (taskId: Task['id']) => void
 }
