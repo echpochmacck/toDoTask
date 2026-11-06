@@ -5,6 +5,7 @@ export type BoardProps = {
   tasks?: Task[]
   onTaskStatusChange: (taskId: Task['id'], status: TaskStatus) => void
   onDeleteTask: (taskId: Task['id']) => void
+  onEditTask: (taskId: Task['id']) => void
   onAddTask?: AddTaskButtonProps['onClick']
 }
 

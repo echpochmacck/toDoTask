@@ -12,5 +12,6 @@ export type BoardStatusItemProps = {
   status: BoardStatus
   tasks: Task[]
   onDeleteTask: (taskId: Task['id']) => void
+  onEditTask: (taskId: Task['id']) => void
 }
 

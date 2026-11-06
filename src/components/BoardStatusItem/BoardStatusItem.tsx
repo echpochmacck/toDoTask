@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { TaskItem } from '../TaskItem/TaskItem'
 import type { BoardStatusItemProps } from './types'
 
-export function BoardStatusItem({ status, tasks, onDeleteTask }: BoardStatusItemProps) {
+export function BoardStatusItem({ status, tasks, onDeleteTask, onEditTask }: BoardStatusItemProps) {
   const headingId = useId()
   const { ref, isDropTarget } = useDroppable({ id: status.id, accept: 'task' })
 
@@ -23,7 +23,7 @@ export function BoardStatusItem({ status, tasks, onDeleteTask }: BoardStatusItem
             <ul className="mt-5 space-y-3">
               {tasks.map((task) => (
                 <li key={task.id}>
-                  <TaskItem task={task} onDeleteTask={onDeleteTask} />
+                  <TaskItem task={task} onDeleteTask={onDeleteTask} onEditTask={onEditTask} />
                 </li>
               ))}
             </ul>

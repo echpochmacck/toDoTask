@@ -7,7 +7,10 @@ import { ModalComponent } from '../ModalComponent/ModalComponent'
 
 function App() {
   const [tasks, setTasks] = useState<Task[]>(exampleTasks)
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [taskModal, setTaskModal] = useState<{ mode: 'create' } | { mode: 'edit'; taskId: Task['id'] } | null>(null)
+  const editingTask = taskModal?.mode === 'edit'
+    ? tasks.find((task) => task.id === taskModal.taskId)
+    : undefined
 
   return (
     <main className="mx-auto max-w-6xl px-5 py-12 sm:px-8 sm:py-20">
@@ -24,7 +27,8 @@ function App() {
       </header>
       <Board
         tasks={tasks}
-        onAddTask={() => setIsCreateModalOpen(true)}
+        onAddTask={() => setTaskModal({ mode: 'create' })}
+        onEditTask={(taskId) => setTaskModal({ mode: 'edit', taskId })}
         onTaskStatusChange={(taskId, status) => {
           setTasks((current) => current.map((task) => task.id === taskId ? { ...task, status } : task))
         }}
@@ -33,16 +37,23 @@ function App() {
         }}
       />
       <ModalComponent
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        title="Create task"
+        isOpen={taskModal !== null}
+        onClose={() => setTaskModal(null)}
+        title={editingTask ? 'Edit task' : 'Create task'}
       >
-        {isCreateModalOpen && (
+        {taskModal && (
           <TaskForm
-            onCancel={() => setIsCreateModalOpen(false)}
+            key={editingTask?.id ?? 'create'}
+            initialValues={editingTask}
+            submitLabel={editingTask ? 'Save changes' : 'Create task'}
+            onCancel={() => setTaskModal(null)}
             onSubmit={(values) => {
-              setTasks((current) => [...current, { ...values, id: crypto.randomUUID() }])
-              setIsCreateModalOpen(false)
+              if (editingTask) {
+                setTasks((current) => current.map((task) => task.id === editingTask.id ? { ...task, ...values } : task))
+              } else {
+                setTasks((current) => [...current, { ...values, id: crypto.randomUUID() }])
+              }
+              setTaskModal(null)
             }}
           />
         )}

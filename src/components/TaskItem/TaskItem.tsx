@@ -1,11 +1,11 @@
 import { useDraggable } from '@dnd-kit/react'
-import { Check, GripVertical, Trash2 } from 'lucide-react'
+import { Check, GripVertical, Pencil, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import type { TaskItemProps } from './types'
 
-export function TaskItem({ task, onDeleteTask }: TaskItemProps) {
+export function TaskItem({ task, onDeleteTask, onEditTask }: TaskItemProps) {
   const isCompleted = task.status === 'done'
   const { ref, handleRef, isDragging } = useDraggable({ id: task.id, type: 'task' })
 
@@ -41,17 +41,30 @@ export function TaskItem({ task, onDeleteTask }: TaskItemProps) {
             </p>
           )}
         </div>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => onDeleteTask(task.id)}
-          aria-label={`Delete task: ${task.title}`}
-          title="Delete task"
-          className="-mt-1 -mr-1 size-8 shrink-0 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-        >
-          <Trash2 aria-hidden="true" />
-        </Button>
+        <div className="-mt-1 -mr-1 flex shrink-0 flex-col">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => onEditTask(task.id)}
+            aria-label={`Edit task: ${task.title}`}
+            title="Edit task"
+            className="size-8 text-muted-foreground hover:text-foreground"
+          >
+            <Pencil aria-hidden="true" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => onDeleteTask(task.id)}
+            aria-label={`Delete task: ${task.title}`}
+            title="Delete task"
+            className="size-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+          >
+            <Trash2 aria-hidden="true" />
+          </Button>
+        </div>
       </CardContent>
     </Card>
   )

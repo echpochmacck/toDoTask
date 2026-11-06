@@ -14,11 +14,15 @@ const statuses = [
   { value: 'done', label: 'Done' },
 ] as const satisfies readonly { value: TaskFormValues['status']; label: string }[]
 
-export function TaskForm({ onSubmit, onCancel }: TaskFormProps) {
+export function TaskForm({ initialValues, submitLabel = 'Create task', onSubmit, onCancel }: TaskFormProps) {
   const id = useId()
   const titleRef = useRef<HTMLInputElement>(null)
   const [shouldValidateTitle, setShouldValidateTitle] = useState(false)
-  const [values, setValues] = useState<TaskFormValues>({ title: '', description: '', status: 'todo' })
+  const [values, setValues] = useState<TaskFormValues>(() => ({
+    title: initialValues?.title ?? '',
+    description: initialValues?.description ?? '',
+    status: initialValues?.status ?? 'todo',
+  }))
   const isTitleValid = Boolean(values.title.trim())
   const titleError = shouldValidateTitle && !isTitleValid ? 'Please enter a task title.' : undefined
 
@@ -92,7 +96,7 @@ export function TaskForm({ onSubmit, onCancel }: TaskFormProps) {
       <Separator />
       <div className="flex justify-end gap-3">
         <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>
-        <Button type="submit" disabled={!isTitleValid}>Create task</Button>
+        <Button type="submit" disabled={!isTitleValid}>{submitLabel}</Button>
       </div>
     </form>
   )

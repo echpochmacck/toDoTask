@@ -30,7 +30,7 @@ const columns = [
   },
 ] as const satisfies readonly BoardStatus[]
 
-export function Board({ tasks = [], onAddTask, onDeleteTask, onTaskStatusChange }: BoardProps) {
+export function Board({ tasks = [], onAddTask, onDeleteTask, onTaskStatusChange, onEditTask }: BoardProps) {
   return (
     <DragDropProvider
       onDragEnd={(event) => {
@@ -59,6 +59,7 @@ export function Board({ tasks = [], onAddTask, onDeleteTask, onTaskStatusChange 
               key={column.id}
               status={column}
               onDeleteTask={onDeleteTask}
+              onEditTask={onEditTask}
               tasks={tasks.filter((task) => task.status === column.id)}
             />
           ))}
