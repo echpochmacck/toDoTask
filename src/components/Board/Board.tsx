@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { DragDropProvider } from '@dnd-kit/react'
-import { CheckCircle2, ListTodo } from 'lucide-react'
+import { CheckCircle2, ListTodo, X } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import type { TaskPriority } from '@/entities/task'
 import { AddTaskButton } from '../AddTaskButton/AddTaskButton'
@@ -45,12 +46,18 @@ export function Board({ tasks = [], onAddTask, onDeleteTask, onTaskStatusChange,
   const [searchQuery, setSearchQuery] = useState('')
   const [priorityFilter, setPriorityFilter] = useState<TaskPriority | 'all'>('all')
   const normalizedQuery = searchQuery.trim().toLocaleLowerCase()
+  const hasActiveFilters = Boolean(normalizedQuery) || priorityFilter !== 'all'
   const visibleTasks = tasks.filter((task) => {
     const matchesSearch = !normalizedQuery
       || `${task.title} ${task.description ?? ''}`.toLocaleLowerCase().includes(normalizedQuery)
     return matchesSearch && (priorityFilter === 'all' || task.priority === priorityFilter)
   })
   const completedTasks = tasks.filter((task) => task.status === 'done').length
+
+  const clearFilters = () => {
+    setSearchQuery('')
+    setPriorityFilter('all')
+  }
 
   return (
     <DragDropProvider
@@ -95,16 +102,23 @@ export function Board({ tasks = [], onAddTask, onDeleteTask, onTaskStatusChange,
             <AddTaskButton onClick={onAddTask} />
           </div>
         </div>
-        {(normalizedQuery || priorityFilter !== 'all') && (
-          <p className="mb-3 text-xs text-muted-foreground" aria-live="polite">
-            Showing {visibleTasks.length} of {tasks.length} tasks
+        <div className="mb-3 flex min-h-7 items-center justify-between gap-3">
+          <p className="text-xs text-muted-foreground" aria-live="polite">
+            Showing <span className="font-medium text-foreground">{visibleTasks.length}</span> of {tasks.length} tasks
           </p>
-        )}
+          {hasActiveFilters && (
+            <Button type="button" variant="ghost" size="sm" onClick={clearFilters} className="h-7 px-2 text-xs text-muted-foreground">
+              <X aria-hidden="true" className="size-3.5" />
+              Clear filters
+            </Button>
+          )}
+        </div>
         <div className="grid items-start gap-4 md:grid-cols-2 xl:grid-cols-4">
           {columns.map((column) => (
             <BoardStatusItem
               key={column.id}
               status={column}
+              isFiltered={hasActiveFilters}
               onTaskStatusChange={onTaskStatusChange}
               onDeleteTask={onDeleteTask}
               onEditTask={onEditTask}

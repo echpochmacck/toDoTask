@@ -6,7 +6,7 @@ import type { SearchFieldProps } from './types'
 export function SearchField({
   value,
   onChange,
-  placeholder = 'Search tasks…',
+  placeholder = 'Search tasks...',
   ariaLabel = 'Search tasks',
 }: SearchFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null)

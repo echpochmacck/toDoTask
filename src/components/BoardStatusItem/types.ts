@@ -11,6 +11,7 @@ export type BoardStatus = {
 export type BoardStatusItemProps = {
   status: BoardStatus
   tasks: Task[]
+  isFiltered?: boolean
   onTaskStatusChange: (taskId: Task['id'], status: TaskStatus) => void
   onDeleteTask: (taskId: Task['id']) => void
   onEditTask: (taskId: Task['id']) => void

@@ -24,9 +24,9 @@ export function TaskItem({ task, onTaskStatusChange, onDeleteTask, onEditTask }:
   const { ref, handleRef, isDragging } = useDraggable({ id: task.id, type: 'task' })
 
   return (
-    <Card ref={ref} className={cn('gap-0 rounded-xl border-border bg-card py-0 shadow-none transition-colors hover:border-border/80 hover:bg-card/80', isCompleted && 'bg-muted/30', isDragging && 'opacity-70 ring-2 ring-primary')}>
+    <Card ref={ref} className={cn('gap-0 rounded-xl border-border bg-card py-0 shadow-none transition-colors hover:border-foreground/15 hover:bg-card/80 focus-within:border-primary/30 focus-within:ring-2 focus-within:ring-primary/10', isCompleted && 'bg-muted/30', isDragging && 'opacity-70 ring-2 ring-primary')}>
       <CardContent className="p-4">
-        <div className="flex items-start gap-3">
+        <div className="flex items-start gap-2.5">
           <button
             type="button"
             role="checkbox"
@@ -40,8 +40,8 @@ export function TaskItem({ task, onTaskStatusChange, onDeleteTask, onEditTask }:
             {isCompleted && <Check aria-hidden="true" className="size-3.5" />}
           </button>
           <h4 className={cn('min-w-0 flex-1 text-sm leading-5 font-semibold wrap-anywhere', isCompleted && 'text-muted-foreground line-through')}>
-              {task.title}
-              {isCompleted && <span className="sr-only"> (completed)</span>}
+            {task.title}
+            {isCompleted && <span className="sr-only"> (completed)</span>}
           </h4>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -68,13 +68,13 @@ export function TaskItem({ task, onTaskStatusChange, onDeleteTask, onEditTask }:
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <div className="pl-8">
+        <div className="pl-7.5">
           {task.description && (
-            <p className="mt-2 line-clamp-3 text-sm leading-5 whitespace-pre-line text-muted-foreground wrap-anywhere">
+            <p className="mt-2.5 line-clamp-3 text-sm leading-5 whitespace-pre-line text-muted-foreground wrap-anywhere">
               {task.description}
             </p>
           )}
-          <div className="mt-4 flex items-center justify-between gap-3">
+          <div className={cn('flex items-center justify-between gap-3 border-t border-border/60 pt-3', task.description ? 'mt-3.5' : 'mt-3')}>
             <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground capitalize">
               <span aria-hidden="true" className={cn('size-2 rounded-full', priorityStyles[task.priority])} />
               {task.priority}
