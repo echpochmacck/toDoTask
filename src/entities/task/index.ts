@@ -1,1 +1,1 @@
-export type { Task, TaskStatus } from './types'
+export type { Task, TaskPriority, TaskStatus } from './types'

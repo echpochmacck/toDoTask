@@ -9,10 +9,17 @@ import { Textarea } from '@/components/ui/textarea'
 import type { TaskFormProps, TaskFormValues } from './types'
 
 const statuses = [
+  { value: 'backlog', label: 'Backlog' },
   { value: 'todo', label: 'To do' },
   { value: 'in-progress', label: 'In progress' },
   { value: 'done', label: 'Done' },
 ] as const satisfies readonly { value: TaskFormValues['status']; label: string }[]
+
+const priorities = [
+  { value: 'low', label: 'Low' },
+  { value: 'medium', label: 'Medium' },
+  { value: 'high', label: 'High' },
+] as const satisfies readonly { value: TaskFormValues['priority']; label: string }[]
 
 export function TaskForm({ initialValues, submitLabel = 'Create task', onSubmit, onCancel }: TaskFormProps) {
   const id = useId()
@@ -22,6 +29,7 @@ export function TaskForm({ initialValues, submitLabel = 'Create task', onSubmit,
     title: initialValues?.title ?? '',
     description: initialValues?.description ?? '',
     status: initialValues?.status ?? 'todo',
+    priority: initialValues?.priority ?? 'medium',
   }))
   const isTitleValid = Boolean(values.title.trim())
   const titleError = shouldValidateTitle && !isTitleValid ? 'Please enter a task title.' : undefined
@@ -50,7 +58,9 @@ export function TaskForm({ initialValues, submitLabel = 'Create task', onSubmit,
           aria-required="true"
           aria-invalid={Boolean(titleError)}
           aria-describedby={titleError ? `${id}-title-error` : undefined}
+          placeholder="e.g. Prepare project brief"
           value={values.title}
+          className="h-9"
           onChange={(event) => {
             setShouldValidateTitle(true)
             setValues({ ...values, title: event.target.value })
@@ -71,31 +81,52 @@ export function TaskForm({ initialValues, submitLabel = 'Create task', onSubmit,
           id={`${id}-description`}
           name="description"
           rows={4}
+          placeholder="Add any useful context or notes…"
           value={values.description}
           onChange={(event) => setValues({ ...values, description: event.target.value })}
         />
       </div>
-      <div className="space-y-2">
-        <Label htmlFor={`${id}-status`}>Status</Label>
-        <Select
-          name="status"
-          value={values.status}
-          onValueChange={(value) => {
-            const status = statuses.find((option) => option.value === value)?.value
-            if (status) setValues({ ...values, status })
-          }}
-        >
-          <SelectTrigger id={`${id}-status`} className="w-full">
-            <SelectValue placeholder="Select status" />
-          </SelectTrigger>
-          <SelectContent>
-            {statuses.map((status) => <SelectItem key={status.value} value={status.value}>{status.label}</SelectItem>)}
-          </SelectContent>
-        </Select>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor={`${id}-status`}>Status</Label>
+          <Select
+            name="status"
+            value={values.status}
+            onValueChange={(value) => {
+              const status = statuses.find((option) => option.value === value)?.value
+              if (status) setValues({ ...values, status })
+            }}
+          >
+            <SelectTrigger id={`${id}-status`} className="h-9 w-full">
+              <SelectValue placeholder="Select status" />
+            </SelectTrigger>
+            <SelectContent>
+              {statuses.map((status) => <SelectItem key={status.value} value={status.value}>{status.label}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor={`${id}-priority`}>Priority</Label>
+          <Select
+            name="priority"
+            value={values.priority}
+            onValueChange={(value) => {
+              const priority = priorities.find((option) => option.value === value)?.value
+              if (priority) setValues({ ...values, priority })
+            }}
+          >
+            <SelectTrigger id={`${id}-priority`} className="h-9 w-full">
+              <SelectValue placeholder="Select priority" />
+            </SelectTrigger>
+            <SelectContent>
+              {priorities.map((priority) => <SelectItem key={priority.value} value={priority.value}>{priority.label}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
       <Separator />
       <div className="flex justify-end gap-3">
-        <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>
+        <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
         <Button type="submit" disabled={!isTitleValid}>{submitLabel}</Button>
       </div>
     </form>
