@@ -28,6 +28,7 @@ export function TaskForm({ initialValues, submitLabel = 'Create task', onSubmit,
   const [values, setValues] = useState<TaskFormValues>(() => ({
     title: initialValues?.title ?? '',
     description: initialValues?.description ?? '',
+    dueDate: initialValues?.dueDate ?? '',
     status: initialValues?.status ?? 'todo',
     priority: initialValues?.priority ?? 'medium',
   }))
@@ -46,7 +47,12 @@ export function TaskForm({ initialValues, submitLabel = 'Create task', onSubmit,
           titleRef.current?.focus()
           return
         }
-        onSubmit({ ...values, title, description: values.description?.trim() || undefined })
+        onSubmit({
+          ...values,
+          title,
+          description: values.description?.trim() || undefined,
+          dueDate: values.dueDate || undefined,
+        })
       }}
     >
       <div className="space-y-2">
@@ -55,6 +61,7 @@ export function TaskForm({ initialValues, submitLabel = 'Create task', onSubmit,
           id={`${id}-title`}
           name="title"
           ref={titleRef}
+          autoFocus
           aria-required="true"
           aria-invalid={Boolean(titleError)}
           aria-describedby={titleError ? `${id}-title-error` : undefined}
@@ -74,6 +81,17 @@ export function TaskForm({ initialValues, submitLabel = 'Create task', onSubmit,
             </p>
           )}
         </div>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor={`${id}-due-date`}>Due date (optional)</Label>
+        <Input
+          id={`${id}-due-date`}
+          name="dueDate"
+          type="date"
+          value={values.dueDate}
+          className="h-9"
+          onChange={(event) => setValues({ ...values, dueDate: event.target.value })}
+        />
       </div>
       <div className="space-y-2">
         <Label htmlFor={`${id}-description`}>Description (optional)</Label>

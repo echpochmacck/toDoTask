@@ -3,7 +3,7 @@ import type { Task } from '../../entities/task'
 export type TaskFormValues = Omit<Task, 'id'>
 
 export type TaskFormProps = {
-  initialValues?: TaskFormValues
+  initialValues?: Partial<TaskFormValues>
   submitLabel?: string
   onSubmit: (task: TaskFormValues) => void
   onCancel: () => void

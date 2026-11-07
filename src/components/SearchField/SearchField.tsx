@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { Search, X } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import type { SearchFieldProps } from './types'
@@ -6,7 +6,7 @@ import type { SearchFieldProps } from './types'
 export function SearchField({
   value,
   onChange,
-  placeholder = 'Search tasks...',
+  placeholder = 'Search tasks… (/)',
   ariaLabel = 'Search tasks',
 }: SearchFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null)
@@ -15,6 +15,23 @@ export function SearchField({
     onChange('')
     inputRef.current?.focus()
   }
+
+  useEffect(() => {
+    const focusSearch = (event: KeyboardEvent) => {
+      const target = event.target
+      const isTyping = target instanceof HTMLInputElement
+        || target instanceof HTMLTextAreaElement
+        || (target instanceof HTMLElement && target.isContentEditable)
+
+      if (event.key === '/' && !isTyping && !event.metaKey && !event.ctrlKey && !event.altKey) {
+        event.preventDefault()
+        inputRef.current?.focus()
+      }
+    }
+
+    window.addEventListener('keydown', focusSearch)
+    return () => window.removeEventListener('keydown', focusSearch)
+  }, [])
 
   return (
     <div className="relative w-full sm:w-64">
