@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Task, TaskPriority, TaskStatus } from '../../entities/task'
+import { sortTasksByPriority } from '../../entities/task/sortTasksByPriority'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
 import { TaskForm } from '../TaskForm/TaskForm'
 import { Board } from '../Board/Board'
@@ -76,20 +77,24 @@ function App() {
         tasks={tasks}
         onAddTask={(status) => setTaskModal({ mode: 'create', status })}
         onQuickAddTask={(title, status) => {
-          setTasks((current) => [...current, {
+          setTasks((current) => sortTasksByPriority([...current, {
             id: crypto.randomUUID(),
             title,
             status,
             priority: 'medium',
-          }])
+          }], status))
         }}
         onEditTask={(taskId) => setTaskModal({ mode: 'edit', taskId })}
         onTaskStatusChange={(taskId, status) => {
-          setTasks((current) => current.map((task) => task.id === taskId ? { ...task, status } : task))
+          setTasks((current) => sortTasksByPriority(
+            current.map((task) => task.id === taskId ? { ...task, status } : task), status,
+          ))
         }}
         onTasksReorder={setTasks}
         onMoveTask={(taskId, status) => {
-          setTasks((current) => current.map((task) => task.id === taskId ? { ...task, status } : task))
+          setTasks((current) => sortTasksByPriority(
+            current.map((task) => task.id === taskId ? { ...task, status } : task), status,
+          ))
         }}
         onDuplicateTask={(taskId) => {
           setTasks((current) => {
@@ -118,9 +123,14 @@ function App() {
             onCancel={() => setTaskModal(null)}
             onSubmit={(values) => {
               if (editingTask) {
-                setTasks((current) => current.map((task) => task.id === editingTask.id ? { ...task, ...values } : task))
+                setTasks((current) => {
+                  const updated = current.map((task) => task.id === editingTask.id ? { ...task, ...values } : task)
+                  return editingTask.priority !== values.priority || editingTask.status !== values.status
+                    ? sortTasksByPriority(updated, values.status)
+                    : updated
+                })
               } else {
-                setTasks((current) => [...current, { ...values, id: crypto.randomUUID() }])
+                setTasks((current) => sortTasksByPriority([...current, { ...values, id: crypto.randomUUID() }], values.status))
               }
               setTaskModal(null)
             }}

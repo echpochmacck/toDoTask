@@ -140,4 +140,61 @@ describe('task board workflows', () => {
       savedTasks[1], savedTasks[2],
     ])
   })
+
+  it('moves a task above medium and low tasks when edited to high priority', async () => {
+    seed([
+      { id: 'medium', title: 'Existing medium', status: 'todo', priority: 'medium' },
+      { id: 'low', title: 'Existing low', status: 'todo', priority: 'low' },
+    ])
+    const user = userEvent.setup()
+    const view = render(<App />)
+    await user.click(screen.getByRole('button', { name: /^Add task$/ }))
+    await user.type(screen.getByRole('textbox', { name: /title/i }), 'New task')
+    await user.click(screen.getByRole('button', { name: 'Create task' }))
+    expect(within(column('To do')).getAllByRole('heading', { level: 4 }).map((item) => item.textContent)).toEqual([
+      'Existing medium', 'New task', 'Existing low',
+    ])
+    await user.click(screen.getByRole('button', { name: 'Actions for New task' }))
+    await user.click(screen.getByRole('menuitem', { name: 'Edit task' }))
+    await user.click(screen.getByRole('combobox', { name: 'Priority' }))
+    await user.click(screen.getByRole('option', { name: 'High' }))
+    await user.click(screen.getByRole('button', { name: 'Save changes' }))
+    expect(within(column('To do')).getAllByRole('heading', { level: 4 }).map((item) => item.textContent)).toEqual([
+      'New task', 'Existing medium', 'Existing low',
+    ])
+    view.unmount()
+    render(<App />)
+    expect(within(column('To do')).getAllByRole('heading', { level: 4 }).map((item) => item.textContent)).toEqual([
+      'New task', 'Existing medium', 'Existing low',
+    ])
+  })
+
+  it('shows previously saved tasks in priority order by default', () => {
+    seed([
+      { id: 'medium', title: 'Existing medium', status: 'todo', priority: 'medium' },
+      { id: 'high', title: 'Existing high', status: 'todo', priority: 'high' },
+      { id: 'low', title: 'Existing low', status: 'todo', priority: 'low' },
+    ])
+    render(<App />)
+    expect(within(column('To do')).getAllByRole('heading', { level: 4 }).map((item) => item.textContent)).toEqual([
+      'Existing high', 'Existing medium', 'Existing low',
+    ])
+  })
+
+  it('keeps a saved manual order after remount', () => {
+    seed([
+      { id: 'medium', title: 'Dragged medium', status: 'todo', priority: 'medium' },
+      { id: 'high', title: 'Dragged high', status: 'todo', priority: 'high' },
+    ])
+    localStorage.setItem('task-board:manual-order:v1', 'true')
+    const view = render(<App />)
+    expect(within(column('To do')).getAllByRole('heading', { level: 4 }).map((item) => item.textContent)).toEqual([
+      'Dragged medium', 'Dragged high',
+    ])
+    view.unmount()
+    render(<App />)
+    expect(within(column('To do')).getAllByRole('heading', { level: 4 }).map((item) => item.textContent)).toEqual([
+      'Dragged medium', 'Dragged high',
+    ])
+  })
 })

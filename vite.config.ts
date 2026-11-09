@@ -15,7 +15,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],
-      include: ['src/components/{App,Board,BoardStatusItem,TaskForm,TaskItem,SearchField}/**/*.{ts,tsx}', 'src/hooks/*.ts'],
+      include: ['src/components/{App,Board,BoardStatusItem,TaskForm,TaskItem,SearchField}/**/*.{ts,tsx}', 'src/entities/task/sortTasksByPriority.ts', 'src/hooks/*.ts'],
       exclude: ['**/types.ts', '**/columns.ts', '**/*.test.{ts,tsx}'],
     },
   },

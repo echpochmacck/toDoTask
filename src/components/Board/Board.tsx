@@ -7,19 +7,27 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import type { Task, TaskPriority } from '@/entities/task'
+import { sortTasksByPriority } from '@/entities/task/sortTasksByPriority'
+import { useLocalStorage } from '@/hooks/useLocalStorage'
 import { AddTaskButton } from '../AddTaskButton/AddTaskButton'
 import { BoardStatusItem } from '../BoardStatusItem/BoardStatusItem'
 import { SearchField } from '../SearchField/SearchField'
 import { COLUMNS } from './columns'
 import type { BoardProps } from './types'
 
+const isBoolean = (value: unknown): value is boolean => typeof value === 'boolean'
+
 export function Board({ tasks = [], onAddTask, onQuickAddTask, onDeleteTask, onDuplicateTask, onTaskStatusChange, onTasksReorder, onEditTask, onMoveTask }: BoardProps) {
+  const [manualOrder, setManualOrder] = useLocalStorage('task-board:manual-order:v1', false, isBoolean)
   const [activeTaskId, setActiveTaskId] = useState<Task['id'] | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [priorityFilter, setPriorityFilter] = useState<TaskPriority | 'all'>('all')
   const normalizedQuery = searchQuery.trim().toLocaleLowerCase()
   const hasActiveFilters = Boolean(normalizedQuery) || priorityFilter !== 'all'
-  const visibleTasks = tasks.filter((task) => {
+  const orderedTasks = manualOrder
+    ? tasks
+    : COLUMNS.reduce<Task[]>((current, column) => sortTasksByPriority(current, column.id), tasks)
+  const visibleTasks = orderedTasks.filter((task) => {
     const matchesSearch = !normalizedQuery
       || `${task.title} ${task.description ?? ''}`.toLocaleLowerCase().includes(normalizedQuery)
     return matchesSearch && (priorityFilter === 'all' || task.priority === priorityFilter)
@@ -42,8 +50,8 @@ export function Board({ tasks = [], onAddTask, onQuickAddTask, onDeleteTask, onD
         setActiveTaskId(null)
         if (event.canceled) return
         const { source, target } = event.operation
-        const task = tasks.find((item) => item.id === source?.id)
-        const targetTask = tasks.find((item) => item.id === target?.id)
+        const task = orderedTasks.find((item) => item.id === source?.id)
+        const targetTask = orderedTasks.find((item) => item.id === target?.id)
         const column = COLUMNS.find((item) => item.id === target?.id)
         if (!task || !target) return
         if (source?.id === target.id) return
@@ -51,7 +59,7 @@ export function Board({ tasks = [], onAddTask, onQuickAddTask, onDeleteTask, onD
         const targetStatus = targetTask?.status ?? column?.id
         if (!targetStatus) return
 
-        const remainingTasks = tasks.filter((item) => item.id !== task.id)
+        const remainingTasks = orderedTasks.filter((item) => item.id !== task.id)
         const movedTask = { ...task, status: targetStatus }
         let insertionIndex = remainingTasks.length
 
@@ -71,6 +79,7 @@ export function Board({ tasks = [], onAddTask, onQuickAddTask, onDeleteTask, onD
 
         const nextTasks = [...remainingTasks]
         nextTasks.splice(insertionIndex, 0, movedTask)
+        setManualOrder(true)
         onTasksReorder(nextTasks)
       }}
     >
