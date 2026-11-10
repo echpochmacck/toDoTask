@@ -61,8 +61,8 @@ export function TaskItem({ task, index, onTaskStatusChange, onDeleteTask, onDupl
   })
 
   return (
-    <>
-      <Card ref={ref} className={cn('animate-in gap-0 rounded-xl border-border bg-card py-0 shadow-none fade-in slide-in-from-top-1 duration-200 ease-out transition hover:-translate-y-px hover:shadow-md focus-within:ring-2 focus-within:ring-ring motion-reduce:animate-none motion-reduce:transform-none motion-reduce:transition-none', isCompleted && 'bg-muted/30', isDragging && 'border-dashed opacity-40 shadow-none ring-0')}>
+    <li ref={ref} className="first:mt-3">
+      <Card className={cn('animate-in gap-0 rounded-xl border-border bg-card py-0 shadow-none fade-in slide-in-from-top-1 duration-200 ease-out transition hover:-translate-y-px hover:shadow-md focus-within:ring-2 focus-within:ring-ring motion-reduce:animate-none motion-reduce:transform-none motion-reduce:transition-none', isCompleted && 'bg-muted/30', isDragging && 'border-dashed opacity-40 shadow-none ring-0')}>
       <CardContent className="p-4">
         <div className="flex items-start gap-2.5">
           <TooltipProvider>
@@ -181,6 +181,6 @@ export function TaskItem({ task, index, onTaskStatusChange, onDeleteTask, onDupl
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </>
+    </li>
   )
 }

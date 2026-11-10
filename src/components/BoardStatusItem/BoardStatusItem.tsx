@@ -81,17 +81,16 @@ export function BoardStatusItem({ status, tasks, isFiltered = false, onQuickAddT
           {tasks.length > 0 ? (
             <ul className="space-y-3 pb-4">
               {tasks.map((task, index) => (
-                <li key={task.id} className="first:mt-3">
-                  <TaskItem
-                    task={task}
-                    index={index}
-                    onTaskStatusChange={onTaskStatusChange}
-                    onDeleteTask={onDeleteTask}
-                    onDuplicateTask={onDuplicateTask}
-                    onEditTask={onEditTask}
-                    onMoveTask={onMoveTask}
-                  />
-                </li>
+                <TaskItem
+                  key={task.id}
+                  task={task}
+                  index={index}
+                  onTaskStatusChange={onTaskStatusChange}
+                  onDeleteTask={onDeleteTask}
+                  onDuplicateTask={onDuplicateTask}
+                  onEditTask={onEditTask}
+                  onMoveTask={onMoveTask}
+                />
               ))}
             </ul>
           ) : (

@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { DragDropProvider, DragOverlay } from '@dnd-kit/react'
-import { isSortable } from '@dnd-kit/react/sortable'
 import { SearchX, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -13,6 +12,7 @@ import { AddTaskButton } from '../AddTaskButton/AddTaskButton'
 import { BoardStatusItem } from '../BoardStatusItem/BoardStatusItem'
 import { SearchField } from '../SearchField/SearchField'
 import { COLUMNS } from './columns'
+import { reorderTaskOnDrop } from './reorderTaskOnDrop'
 import type { BoardProps } from './types'
 
 const isBoolean = (value: unknown): value is boolean => typeof value === 'boolean'
@@ -46,39 +46,18 @@ export function Board({ tasks = [], onAddTask, onQuickAddTask, onDeleteTask, onD
       onDragStart={(event) => {
         setActiveTaskId(String(event.operation.source?.id ?? ''))
       }}
+      onDragOver={(event) => {
+        // Keep React in charge of list nodes; the library's optimistic sorter
+        // otherwise reparents them before the task state has been updated.
+        event.preventDefault()
+      }}
       onDragEnd={(event) => {
         setActiveTaskId(null)
         if (event.canceled) return
         const { source, target } = event.operation
-        const task = orderedTasks.find((item) => item.id === source?.id)
-        const targetTask = orderedTasks.find((item) => item.id === target?.id)
-        const column = COLUMNS.find((item) => item.id === target?.id)
-        if (!task || !target) return
-        if (source?.id === target.id) return
-
-        const targetStatus = targetTask?.status ?? column?.id
-        if (!targetStatus) return
-
-        const remainingTasks = orderedTasks.filter((item) => item.id !== task.id)
-        const movedTask = { ...task, status: targetStatus }
-        let insertionIndex = remainingTasks.length
-
-        if (targetTask) {
-          insertionIndex = remainingTasks.findIndex((item) => item.id === targetTask.id)
-          if (insertionIndex < 0) insertionIndex = remainingTasks.length
-
-          if (isSortable(source) && isSortable(target)
-            && source.sortable.group === target.sortable.group
-            && source.sortable.index < target.sortable.index) {
-            insertionIndex += 1
-          }
-        } else {
-          const lastColumnTaskIndex = remainingTasks.findLastIndex((item) => item.status === targetStatus)
-          if (lastColumnTaskIndex >= 0) insertionIndex = lastColumnTaskIndex + 1
-        }
-
-        const nextTasks = [...remainingTasks]
-        nextTasks.splice(insertionIndex, 0, movedTask)
+        if (!source || !target) return
+        const nextTasks = reorderTaskOnDrop(orderedTasks, String(source.id), String(target.id))
+        if (!nextTasks) return
         setManualOrder(true)
         onTasksReorder(nextTasks)
       }}

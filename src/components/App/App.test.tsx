@@ -2,6 +2,7 @@ import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Task } from '@/entities/task'
+import { moveTaskToIndex } from '@/entities/task/moveTaskToIndex'
 import App from './App'
 
 const storageKey = 'task-board:v1'
@@ -196,5 +197,26 @@ describe('task board workflows', () => {
     expect(within(column('To do')).getAllByRole('heading', { level: 4 }).map((item) => item.textContent)).toEqual([
       'Dragged medium', 'Dragged high',
     ])
+  })
+
+  it('restores moved cards with column counts matching rendered cards', () => {
+    const initial: Task[] = [
+      { id: 'a', title: 'First backlog task', status: 'backlog', priority: 'medium' },
+      { id: 'b', title: 'Second backlog task', status: 'backlog', priority: 'medium' },
+    ]
+    seed(moveTaskToIndex(initial, 'b', 'todo', 0))
+    localStorage.setItem('task-board:manual-order:v1', 'true')
+
+    for (let mount = 0; mount < 2; mount++) {
+      const view = render(<App />)
+      expect(within(column('Backlog')).getAllByRole('listitem')).toHaveLength(1)
+      expect(within(column('Backlog')).getByText('First backlog task')).toBeVisible()
+      expect(within(column('To do')).getAllByRole('listitem')).toHaveLength(1)
+      expect(within(column('To do')).getByText('Second backlog task')).toBeVisible()
+      expect(column('Backlog')).toHaveTextContent('Backlog1')
+      expect(column('To do')).toHaveTextContent('To do1')
+      expect(screen.getByRole('region', { name: 'Kanban task board' })).toHaveTextContent('2 tasks')
+      view.unmount()
+    }
   })
 })
