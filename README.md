@@ -40,6 +40,8 @@ Open the local URL printed by Vite. To create a production build, run:
 npm run build
 ```
 
+The standard build uses root-relative asset paths for Cloudflare Pages. Set its build command to `npm run build` and output directory to `dist`. GitHub Pages uses `npm run build -- --mode github` in the deployment workflow so assets load under `/toDoTask/`.
+
 ## Testing
 
 ```bash

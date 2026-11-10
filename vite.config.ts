@@ -4,8 +4,8 @@ import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'vitest/config'
 
 // https://vite.dev/config/
-export default defineConfig({
-  base: '/toDoTask/',
+export default defineConfig(({ mode }) => ({
+  base: mode === 'github' ? '/toDoTask/' : '/',
   plugins: [react(), tailwindcss()],
   build: { chunkSizeWarningLimit: 650 },
   resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
@@ -20,4 +20,4 @@ export default defineConfig({
       exclude: ['**/types.ts', '**/columns.ts', '**/*.test.{ts,tsx}'],
     },
   },
-})
+}))
