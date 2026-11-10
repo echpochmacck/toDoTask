@@ -5,6 +5,7 @@ import { defineConfig } from 'vitest/config'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/toDoTask/',
   plugins: [react(), tailwindcss()],
   build: { chunkSizeWarningLimit: 650 },
   resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
